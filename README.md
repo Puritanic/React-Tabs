@@ -1,7 +1,5 @@
 # React Tabs
 
-Example of Tabs component built with using React Context API
-
 If using [yarn](https://yarnpkg.com) (recommended)
 
 ```

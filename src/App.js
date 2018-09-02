@@ -8,24 +8,18 @@ import * as text from './text';
 
 class Tabs extends Component {
 	state = {
-		activeIndex: this.props.defaultActiveIndex || 0,
+		activeIndex: 0,
 	};
 
-	isControlled() {
-		return this.props.activeIndex != null;
-	}
-
 	selectTabIndex = activeIndex => {
-		this.props.onChange(activeIndex);
-		if (!this.isControlled()) {
-			this.setState({ activeIndex });
-		}
+		this.setState({ activeIndex });
 	};
 
 	render() {
+		// Map over passed children and pass them additional props (Cool!)
 		const children = React.Children.map(this.props.children, child => {
 			return React.cloneElement(child, {
-				activeIndex: this.isControlled() ? this.props.activeIndex : this.state.activeIndex,
+				activeIndex: this.state.activeIndex,
 				onSelectTab: this.selectTabIndex,
 			});
 		});
@@ -73,47 +67,49 @@ class TabPanel extends Component {
 	}
 }
 
-const COLORS = ['red', 'blue', 'green', 'yellow'];
+class DataTabs extends Component {
+	render() {
+		const { data } = this.props;
+		return (
+			<Tabs>
+				<TabPanels>
+					{data.map(tab => (
+						<TabPanel>{tab.content}</TabPanel>
+					))}
+				</TabPanels>
+				<TabList>
+					{data.map(tab => (
+						<Tab>{tab.label}</Tab>
+					))}
+				</TabList>
+			</Tabs>
+		);
+	}
+}
 
 class App extends Component {
-	state = {
-		currentTab: 0,
-	};
-
 	render() {
-		const { currentTab } = this.state;
-		const color = COLORS[currentTab];
+		const tabData = [
+			{
+				label: <FaAutomobile />,
+				content: text.cars,
+			},
+			{
+				label: <FaBed />,
+				content: text.hotels,
+			},
+			{
+				label: <FaPlane />,
+				content: text.flights,
+			},
+			{
+				label: <FaSpaceShuttle />,
+				content: text.space,
+			},
+		];
 		return (
-			<div className={`App ${color}-bg`}>
-				<Tabs
-					activeIndex={this.state.currentTab}
-					onChange={index => {
-						this.setState({ currentTab: index });
-					}}
-				>
-					<TabList>
-						<Tab>
-							<FaAutomobile className={currentTab === 0 ? COLORS[currentTab] : ''} />
-						</Tab>
-						<Tab>
-							<FaBed className={currentTab === 1 ? COLORS[currentTab] : ''} />
-						</Tab>
-						<Tab>
-							<FaPlane className={currentTab === 2 ? COLORS[currentTab] : ''} />
-						</Tab>
-						<Tab>
-							<FaSpaceShuttle
-								className={currentTab === 3 ? COLORS[currentTab] : ''}
-							/>
-						</Tab>
-					</TabList>
-					<TabPanels>
-						<TabPanel>{text.cars}</TabPanel>
-						<TabPanel>{text.hotels}</TabPanel>
-						<TabPanel>{text.flights}</TabPanel>
-						<TabPanel>{text.space}</TabPanel>
-					</TabPanels>
-				</Tabs>
+			<div className="App">
+				<DataTabs data={tabData} />
 			</div>
 		);
 	}
